@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body class="container">
+
+<header>
+  <%- include('../partials/header'); %>
+</header>
+
+<main>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="jumbotron">
+      <div class="col-sm-6">
+        <h3>Холбоо хамаарал харуулах</h3>
+        <form method="get" action="/resultshortestpath">
+          <div class="form-group">
+            <label>Эхний хүний регистрийн дугаар</label>
+            <input type="text" class="form-control" placeholder="Эхний хүний регистрийн дугаар оруулна уу" pattern="([А-Яа-я]{2}[0-9]{8})+" onkeyup="this.value = this.value.toUpperCase();" title="Жишээ: АА12345678 мөн крилл үсгээр бичнэ үү" name="S1" required>
+            </div>
+            <div class="form-group">
+              <label>Дараагийн хүний регистрийн дугаар</label>
+              <input type="text" class="form-control" placeholder="Дараагийн хүний регистрийн дугаар оруулна уу" pattern="([А-Яа-я]{2}[0-9]{8})+" onkeyup="this.value = this.value.toUpperCase();" title="Жишээ: АА12345678 мөн крилл үсгээр бичнэ үү" name="S2" required>
+              </div>
+              <button type="submit" class="btn btn-dark">Илгээх</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer>
+  <%- include('../partials/footer'); %>
+</footer>
+
+</body>
+</html>

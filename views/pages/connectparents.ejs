@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body class="container">
+
+<header>
+  <%- include('../partials/header'); %>
+</header>
+
+<main>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="jumbotron">
+      <div class="col-sm-6">
+        <h3>Эцэг/Эх ба хүүхэд холбох</h3>
+        <form method="post" action="/connectparents">
+          <div class="form-group">
+            <label>Эцэг/Эх-ийн регистрийн дугаар</label>
+            <input type="text" class="form-control" placeholder="Эцэг/Эхийн регистрийн дугаар оруулна уу" name="register1" pattern="([А-Яа-я]{2}[0-9]{8})+" onkeyup="this.value = this.value.toUpperCase();" title="Жишээ: АА12345678 мөн крилл үсгээр бичнэ үү" required>
+            </div>
+            <div class="form-group">
+              <label>Эцэг/Эх-ийн төрөл</label>
+              <select class="form-control" name="R1" required>
+                <option hidden value="">Эцэг/Эх-ийн төрөл сонгоно уу</option>
+          <option>Аав</option>
+          <option>Ээж</option>
+          <option>ХойдАав</option>
+          <option>ХойдЭэж</option>
+              </select>
+            </div>
+          <div class="form-group">
+            <label>Хүүхдийн регистрийн дугаар</label>
+            <input type="text" class="form-control" placeholder="Хүүхдийн регистрийн дугаар оруулна уу" name="register" pattern="([А-Яа-я]{2}[0-9]{8})+" onkeyup="this.value = this.value.toUpperCase();" title="Жишээ: АА12345678 мөн крилл үсгээр бичнэ үү" required>
+            </div>
+            <div class="form-group">
+              <label>Хүүхдийн төрөл</label>
+              <select class="form-control" name="R2" required>
+                <option hidden value="">Хүүхдийн төрөл сонгоно уу</option>
+          <option>Хүү</option>
+          <option>Охин</option>
+          <option>ӨргөмөлХүү</option>
+          <option>ӨргөмөлОхин</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-dark">Илгээх</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer>
+  <%- include('../partials/footer'); %>
+</footer>
+
+</body>
+</html>

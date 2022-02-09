@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head'); %>
+</head>
+<body class="container">
+
+<header>
+  <%- include('../partials/header'); %>
+</header>
+<script>
+  function myFunction(){
+   
+    var a = document.getElementById('namePattern');
+    // if(a.value!==null || a.value!=='undefined'){
+    let mnWord='абвгдеёжзийклмноөпрстуүфхцчшщъыьэыюя';
+    let mnWord1='АБВГДЫЫЕЁЖЗИЙКЛМНӨПРСТУҮФХЦЧШЩЬЪЫЭЮЯ';
+    if(mnWord1.includes(a.value[0])){
+      a.value = a.value.toLowerCase();
+      a.value = a.value[0].toUpperCase()+a.value.slice(1); 
+    }
+    else if(mnWord.includes(a.value[0])){
+      a.value = a.value.toLowerCase();
+      a.value = a.value[0].toUpperCase()+a.value.slice(1); 
+    }
+    else if(!mnWord.includes(a.value[a.value.length-1])&&mnWord1.includes(a.value[0])) {
+      a.value="";
+      a.value = a.value[0].toUpperCase()+a.value.slice(1); 
+    // }
+  }
+  else { a.value="";}
+}
+</script>
+<main>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="jumbotron">
+      <div class="col-sm-5">
+      <h3>Хүн нэмэх</h3>
+      <form method="post" action="/adduser">
+        <div class="form-group">
+          <label>Нэр</label>
+          <input id='namePattern' type="text" class="form-control" placeholder="Өөрийн нэрээ бичнэ үү" name="firstName" oninput="myFunction();" title="Крилл үсэг ашиглана уу" required>
+          </div>
+        <div class="form-group">
+          <label>Овог</label>
+          <input id='namePattern' type="text" class="form-control" placeholder="Овгоо бичнэ үү" name="lastName" title="Крилл үсэг ашиглана уу" required>
+          </div>
+        <div class="form-group">
+          <label>Регистрийн дугаар</label>
+          <input type="text" class="form-control" placeholder="Регистрийн дугаараа оруулна уу" name="register" pattern="([А-Яа-я]{2}[0-9]{8})+" onkeyup="this.value = this.value.toUpperCase();" title="Жишээ: АА12345678 мөн крилл үсгээр бичнэ үү" required>
+          </div>
+          <div class="form-group">
+            <label>Төрсөн он сар</label>
+            <input type="date" class="form-control" name="dob" required>
+            </div>
+          <div class="form-group">
+            <label for="exampleFormControlSelect1">Хүйс</label>
+            <select class="form-control" name="S1" required>
+              <option hidden value="">Хүйсээ сонгоно уу</option>
+              <option>Эрэгтэй</option>
+              <option>Эмэгтэй</option>
+              <option>Бусад</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-dark">Илгээх</button>
+      </form>
+    </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer>
+  <%- include('../partials/footer'); %>
+</footer>
+
+</body>
+</html>
