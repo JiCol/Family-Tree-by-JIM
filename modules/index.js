@@ -1,8 +1,18 @@
 
+// const neo4j = require('neo4j-driver');
+// const driver = neo4j.driver('bolt://127.0.0.1:7687', neo4j.auth.basic('neo4j', '123test'));
+// const session = driver.session({
+//   database: 'realfamilytree'
+// });
+
 const neo4j = require('neo4j-driver');
-const driver = neo4j.driver('bolt://127.0.0.1:7687', neo4j.auth.basic('neo4j', '123test'));
+const uri = 'neo4j+s://14f4bfca.databases.neo4j.io';
+ const user = 'neo4j';
+ const password = 'CCr7907w5u5G-mw6QicIuEZR86-LKKpjOdNO0iSXJmI';
+
+const driver = neo4j.driver(uri, neo4j.auth.basic(user, password))
 const session = driver.session({
-  database: 'realfamilytree'
+  database: 'neo4j'
 });
 
 module.exports.addUser = async function (req, res) {
