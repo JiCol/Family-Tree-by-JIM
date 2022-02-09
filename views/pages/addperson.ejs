@@ -18,17 +18,54 @@
     if(mnWord1.includes(a.value[0])){
       a.value = a.value.toLowerCase();
       a.value = a.value[0].toUpperCase()+a.value.slice(1); 
+      document.getElementById("myAlert").style.display="none";
     }
     else if(mnWord.includes(a.value[0])){
       a.value = a.value.toLowerCase();
       a.value = a.value[0].toUpperCase()+a.value.slice(1); 
+      document.getElementById("myAlert").style.display="none";
     }
     else if(!mnWord.includes(a.value[a.value.length-1])&&mnWord1.includes(a.value[0])) {
       a.value="";
       a.value = a.value[0].toUpperCase()+a.value.slice(1); 
+      document.getElementById("myAlert").style.display="block";
     // }
+  }else if(!a.value){
+    document.getElementById("myAlert").style.display="none";
   }
-  else { a.value="";}
+  else {
+  a.value="";
+  document.getElementById("myAlert").style.display="block";
+  }
+}
+function myFunction1(){
+   
+   var a = document.getElementById('namePattern1');
+   // if(a.value!==null || a.value!=='undefined'){
+   let mnWord='абвгдеёжзийклмноөпрстуүфхцчшщъыьэыюя';
+   let mnWord1='АБВГДЫЫЕЁЖЗИЙКЛМНӨПРСТУҮФХЦЧШЩЬЪЫЭЮЯ';
+   if(mnWord1.includes(a.value[0])){
+     a.value = a.value.toLowerCase();
+     a.value = a.value[0].toUpperCase()+a.value.slice(1); 
+     document.getElementById("myAlert1").style.display="none";
+   }
+   else if(mnWord.includes(a.value[0])){
+     a.value = a.value.toLowerCase();
+     a.value = a.value[0].toUpperCase()+a.value.slice(1); 
+     document.getElementById("myAlert1").style.display="none";
+   }
+   else if(!mnWord.includes(a.value[a.value.length-1])&&mnWord1.includes(a.value[0])) {
+     a.value="";
+     a.value = a.value[0].toUpperCase()+a.value.slice(1); 
+     document.getElementById("myAlert1").style.display="block";
+   // }
+ }else if(!a.value){
+   document.getElementById("myAlert1").style.display="none";
+ }
+ else {
+ a.value="";
+ document.getElementById("myAlert1").style.display="block";
+ }
 }
 </script>
 <main>
@@ -41,11 +78,17 @@
         <div class="form-group">
           <label>Нэр</label>
           <input id='namePattern' type="text" class="form-control" placeholder="Өөрийн нэрээ бичнэ үү" name="firstName" oninput="myFunction();" title="Крилл үсэг ашиглана уу" required>
+          <div class="invalid-feedback" id="myAlert" role="alert" style="display: none;">
+            Крилл үсэг ашиглана уу!
+          </div>
           </div>
         <div class="form-group">
           <label>Овог</label>
-          <input id='namePattern' type="text" class="form-control" placeholder="Овгоо бичнэ үү" name="lastName" title="Крилл үсэг ашиглана уу" required>
+          <input id='namePattern1' type="text" class="form-control" placeholder="Овгоо бичнэ үү" name="lastName" oninput="myFunction1();" title="Крилл үсэг ашиглана уу" required>
+          <div class="invalid-feedback" id="myAlert1" role="alert" style="display: none;">
+            Крилл үсэг ашиглана уу!
           </div>
+        </div>
         <div class="form-group">
           <label>Регистрийн дугаар</label>
           <input type="text" class="form-control" placeholder="Регистрийн дугаараа оруулна уу" name="register" pattern="([А-Яа-я]{2}[0-9]{8})+" onkeyup="this.value = this.value.toUpperCase();" title="Жишээ: АА12345678 мөн крилл үсгээр бичнэ үү" required>
