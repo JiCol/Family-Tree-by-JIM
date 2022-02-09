@@ -44,6 +44,7 @@ nodes = [...nodes, {"name": childs[childs.length-1].end.properties.firstName,"ln
 let tmpArr=[];
     childs.forEach((item, index)=> {
          tmpArr.push({"source":item.start.properties.firstName, "target":item.end.properties.firstName, "type": item.relationship.type});
+         tmpArr.push({"source":item.end.properties.firstName, "target":item.start.properties.firstName});
     })
     links=[...tmpArr];
 
