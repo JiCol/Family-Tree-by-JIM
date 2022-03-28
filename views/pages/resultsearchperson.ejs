@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <%- include('../partials/resultsearchpersonhead'); %>
+  </head>
+  <script>
+    $(document).ready(function () {
+      $('[data-toggle="tooltip"]').tooltip();
+      var actions = $('table td:last-child').html();
+      // Edit row on edit button click
+      $(document).on('click', '.edit', function () {
+        $(this)
+          .parents('tr')
+          .find('td:not(:last-child)')
+          .each(function () {
+            if ($(this).attr('id') === 'dob')
+              $(this).html(
+                '<input type="date" name =' +
+                  $(this).attr('id') +
+                  ' class="form-control" value="' +
+                  $(this).text() +
+                  '">'
+              );
+            else if ($(this).attr('id') === 'register')
+              $(this).html(
+                '<input type="text" name =' +
+                  $(this).attr('id') +
+                  ' class="form-control" value="' +
+                  $(this).text() +
+                  '" readonly="true">'
+              );
+            else
+              $(this).html(
+                '<input type="text" name =' +
+                  $(this).attr('id') +
+                  ' class="form-control" value="' +
+                  $(this).text() +
+                  '">'
+              );
+          });
+        // $(this).parents("tr").find(".add, .edit").toggle();
+        // $(".add-new").attr("disabled", "disabled");
+        // $(".delete").css("display","block");
+      });
+    });
+    edit ? edit.icon : '';
+    function subfunc() {
+      $('#uchiha').attr('action', '/edited');
+      $('#uchiha').submit();
+    }
+    function subfunc1() {
+      $('#uchiha').attr('action', '/deleted');
+      $('#uchiha').submit();
+    }
+  </script>
+  <body class="container">
+    <header><%- include('../partials/header'); %></header>
+
+    <main>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="jumbotron">
+            <div class="col-sm-12">
+              <h3>Хэрэглэгчийн мэдээлэл</h3>
+              <form method="post" id="uchiha">
+                <div class="form-group">
+                  <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th>Register</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>DOB</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <% persons.forEach(function(person){%>
+                      <tr id="">
+                        <td id="register"><%= person.register %></td>
+                        <td id="firstName"><%= person.firstName %></td>
+                        <td id="lastName"><%= person.lastName %></td>
+                        <td id="dob"><%= person.dob %></td>
+                        <div>
+                          <td>
+                            <a
+                              onclick="subfunc()"
+                              class="add"
+                              title="Add"
+                              data-toggle="tooltip"
+                              ><i class="material-icons">&#xE03B;</i></a
+                            >
+                            <a class="edit" title="Edit" data-toggle="tooltip"
+                              ><i class="material-icons">&#xE254;</i></a
+                            >
+                            <a
+                              onclick="subfunc1()"
+                              class="delete"
+                              title="Delete"
+                              data-toggle="tooltip"
+                              ><i class="material-icons">&#xE872;</i></a
+                            >
+                          </td>
+                        </div>
+                      </tr>
+                      <%})%>
+                    </tbody>
+                  </table>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer><%- include('../partials/footer'); %></footer>
+  </body>
+</html>

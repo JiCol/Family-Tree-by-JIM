@@ -51,13 +51,26 @@ app.get('/connectparents', function(req, res) {
    res.render('pages/firstlevel');
  });
 
+ app.get('/firstlevelV2', function(req, res){
+  res.render('pages/firstlevelV2');
+});
+
 app.get('/resultfirstlevel', mainLogics.firstLevel);
+
+app.get('/resultfirstlevelV2', mainLogics.firstLevelV2);
 
 app.get('/shortestpath', function(req, res){
   res.render('pages/shortestpath');
 });
 
 app.get('/resultshortestpath', mainLogics.shortestPath);
+
+app.get('/searchperson', function(req, res){
+  res.render('pages/searchperson');
+});
+
+app.get('/resultsearchperson', mainLogics.searchPerson);
+
 
 //Iishee zugleed yhavde...
 app.use('/', indexRouter);

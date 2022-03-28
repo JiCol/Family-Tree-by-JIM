@@ -17,13 +17,10 @@
       <script src="https://d3js.org/d3.v4.min.js" type="text/javascript"></script>
       <script src="https://d3js.org/d3-selection-multi.v1.js"></script>
       <script>
-          
         let parentz = <%-JSON.stringify(persons)%>;
-        console.log(parentz);
-        let childs = <%-JSON.stringify(guys)%>;
+        // let childs = <%-JSON.stringify(guys)%>;
       </script>
-      
-      <script src="javascripts/firstlevel.js"></script>
+      <script src="javascripts/firstlevelV2.js"></script>
       <script type="text/javascript">
           
       var colors = d3.scaleOrdinal(d3.schemeCategory10);
@@ -60,102 +57,120 @@
       // })
       
           var graph = naruto;
-          update(naruto.links, naruto.nodes);
-      function update(links, nodes) {
-          link = svg.selectAll(".link")
-              .data(links)
-              .enter()
-              .append("line")
-              .attr("class", "link")
-              .attr('marker-end','url(#arrowhead)')
-      
-          link.append("title")
-              .text(function (d) {return d.type;});
-      
-          edgepaths = svg.selectAll(".edgepath")
-              .data(links)
-              .enter()
-              .append('path')
-              .attrs({
-                  'class': 'edgepath',
-                  'fill-opacity': 0,
-                  'stroke-opacity': 0,
-                  'id': function (d, i) {return 'edgepath' + i}
-              })
-              .style("pointer-events", "none");
-      
-          edgelabels = svg.selectAll(".edgelabel")
-              .data(links)
-              .enter()
-              .append('text')
-              .style("pointer-events", "none")
-              .attrs({
-                  'class': 'edgelabel',
-                  'id': function (d, i) {return 'edgelabel' + i},
-                  'font-size': 12,
-                  'fill': '#FFFFFF',
-                  'opacity': 1
-              });
-      
-          edgelabels.append('textPath')
-              .attr('xlink:href', function (d, i) {return '#edgepath' + i})
-              .style("text-anchor", "middle")
-              .style("pointer-events", "none")
-              .attr("startOffset", "50%")
-              .text(function (d) {return d.type});
-      
-          node = svg.selectAll(".node")
-              .data(nodes)
-              .enter()
-              .append("g")
-              .attr("class", "node")
-              .call(d3.drag()
-                      .on("start", dragstarted)
-                      .on("drag", dragged)
-                      //.on("end", dragended)
-              );
-              
-              let div = d3.select("body").append("div")	
-                .attr("class", "tooltip")				
-                .style("opacity", 0);
+          naruto.links=[];
+          function update(links, nodes) {
 
-          node.append("circle")
-              .attr("r", 18)
-              .style("fill", function (d, i) {return colors(i);})
-              .on("mouseover", function(d) {		
-                    div.style("opacity", .9);	
-      div.html("Овог: " + d.lname
-      + "</br>" + "Нэр: " + d.name
-      + "</br>" + "Регистр: " + d.register
-      + "</br>" + "Нас: " + d.dob
-      + "</br>" + "Хүйс: " + d.label)	
-      .style("left", (d3.event.pageX) + "px")		
-      .style("top", (d3.event.pageY - 28) + "px");	
-      })					
-    .on("mouseout", function(d) {		
-      div.style("opacity", 0);	
+link = svg.selectAll(".link")
+    .data(links)
+    .enter()
+    .append("line")
+    .attr("class", "link")
+    .attr('marker-end','url(#arrowhead)')
+
+link.append("title")
+    .text(function (d) {return d.type;});
+
+edgepaths = svg.selectAll(".edgepath")
+    .data(links)
+    .enter()
+    .append('path')
+    .attrs({
+        'class': 'edgepath',
+        'fill-opacity': 0,
+        'stroke-opacity': 0,
+        'id': function (d, i) {return 'edgepath' + i}
+    })
+    .style("pointer-events", "none");
+
+edgelabels = svg.selectAll(".edgelabel")
+    .data(links)
+    .enter()
+    .append('text')
+    .style("pointer-events", "none")
+    .attrs({
+        'class': 'edgelabel',
+        'id': function (d, i) {return 'edgelabel' + i},
+        'font-size': 12,
+        'fill': '#FFFFFF',
+        'opacity': 1
     });
-      
-          node.append("title")
-              .text(function (d) {return d.id;});
-      
-          node.append("text")
-              .attr("dy", 0)
-              .attr("dx", -5)
-              .style("fill", "#FFFFFF")
-              .style("font-size", "14")
-              .style("opacity","1")
-              .text(function (d) {return d.name;});
-              // .text(function (d) {return d.name+":"+d.label;});
-      
-          simulation
-              .nodes(nodes)
-              .on("tick", ticked);
-      
-          simulation.force("link")
-              .links(links);
-      }
-      
+
+edgelabels.append('textPath')
+    .attr('xlink:href', function (d, i) {return '#edgepath' + i})
+    .style("text-anchor", "middle")
+    .style("pointer-events", "none")
+    .attr("startOffset", "50%")
+    .text(function (d) {return d.type});
+
+node = svg.selectAll(".node")
+    .data(nodes)
+    .enter()
+    .append("g")
+    .attr("class", "node")
+    .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            //.on("end", dragended)
+    );
+    
+    let div = d3.select("body").append("div")	
+      .attr("class", "tooltip")				
+      .style("opacity", 0);
+
+node.append("circle")
+    .on("click", click)
+    .attr("r", 18)
+    .style("fill", function (d, i) {return colors(i);})
+    .on("mouseover", function(d) {		
+          div.style("opacity", .9);	
+div.html("Овог: " + d.lname
++ "</br>" + "Нэр: " + d.name
++ "</br>" + "Регистр: " + d.register
++ "</br>" + "Нас: " + d.dob
++ "</br>" + "Хүйс: " + d.label)	
+.style("left", (d3.event.pageX) + "px")		
+.style("top", (d3.event.pageY - 28) + "px");	
+})					
+.on("mouseout", function(d) {		
+div.style("opacity", 0);	
+});
+
+function click(d){
+    console.log(d);
+  if (!d3.select(this).classed("selected")) {
+       d3.select(this)
+           .style('stroke', 'black')
+           .classed("selected",true)
+  }
+  else {
+      d3.select(this)
+          .style('stroke', 'white')
+          .classed("selected",false);
+  }
+}
+
+
+node.append("title")
+    .text(function (d) {return d.id;});
+
+node.append("text")
+    .attr("dy", 0)
+    .attr("dx", -5)
+    .style("fill", "#FFFFFF")
+    .style("font-size", "14")
+    .style("opacity","1")
+    .text(function (d) {return d.name;});
+    // .text(function (d) {return d.name+":"+d.label;});
+
+simulation
+    .nodes(nodes)
+    .on("tick", ticked);
+
+simulation.force("link")
+    .links(links);
+}
+          update(naruto.links, naruto.nodes);
+ 
       function ticked() {
           link
               .attr("x1", function (d) {return d.source.x;})
