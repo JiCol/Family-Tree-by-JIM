@@ -1,19 +1,19 @@
 
-// const neo4j = require('neo4j-driver');
-// const driver = neo4j.driver('bolt://127.0.0.1:7687', neo4j.auth.basic('neo4j', '123test'));
-// const session = driver.session({
-//   database: 'realfamilytree'
-// });
-
 const neo4j = require('neo4j-driver');
-const uri = 'neo4j+s://14f4bfca.databases.neo4j.io';
- const user = 'neo4j';
- const password = 'CCr7907w5u5G-mw6QicIuEZR86-LKKpjOdNO0iSXJmI';
-
-const driver = neo4j.driver(uri, neo4j.auth.basic(user, password))
+const driver = neo4j.driver('bolt://127.0.0.1:7687', neo4j.auth.basic('neo4j', '123test'));
 const session = driver.session({
-  database: 'neo4j'
+  database: 'realfamilytree'
 });
+
+// const neo4j = require('neo4j-driver');
+// const uri = 'neo4j+s://14f4bfca.databases.neo4j.io';
+//  const user = 'neo4j';
+//  const password = 'CCr7907w5u5G-mw6QicIuEZR86-LKKpjOdNO0iSXJmI';
+
+// const driver = neo4j.driver(uri, neo4j.auth.basic(user, password))
+// const session = driver.session({
+//   database: 'neo4j'
+// });
 
 module.exports.addUser = async function (req, res) {
   var firstName = req.body.firstName;
@@ -133,6 +133,49 @@ module.exports.connectParents = function(req,res){
     return res.render('pages/resultfirstlevel', execution);
   };
 
+  module.exports.firstLevelV2 = async function (req, res) {
+    var S1 = req.query.S1;
+    const query1 = "match (p:Person{register:'input'}) return p";
+    const obj1 = query1.replace('input', S1);
+    // const query2 = "match (p:Person{register:'input'})-[f:Аав]->(p1:Person)<-[m:Гэрлэсэн]-(p2:Person)-[:Хүү|:Охин]->(p3:Person) return p3";
+    // const obj2 = query2.replace('input', S1);
+    // Person
+    const execution = await session.readTransaction(async (trun) => {
+      const parents = await trun.run(obj1);
+      // const persons = await trun.run(obj2);
+      let personArr = [];
+      // let guyArr = [];
+      for (let i = 0; i < parents.records?.length; i+=1) {
+        personArr.push({
+                  id: parents.records[i]._fields[0].identity.low,
+                  register: parents.records[i]._fields[0].properties.register,
+                  firstName: parents.records[i]._fields[0].properties.firstName,
+                  lastName: parents.records[i]._fields[0].properties.lastName,
+                  dob: parents.records[i]._fields[0].properties.dob,
+                  labels: parents.records[i]._fields[0].labels
+                });
+      }
+      // for (let j = 0; j < persons.records?.length; j+=1) {
+      //   guyArr.push({
+      //                   id: persons.records[j]._fields[0].identity.low,
+      //                   register: persons.records[j]._fields[0].properties.register,
+      //                   firstName: persons.records[j]._fields[0].properties.firstName,
+      //                   lastName: persons.records[j]._fields[0].properties.lastName,
+      //                   dob: persons.records[j]._fields[0].properties.dob,
+      //                   labels: persons.records[j]._fields[0].labels
+      //                 })
+      // }
+      console.log(personArr);
+      return {
+        persons: personArr, 
+        guys: [],
+        isDone: true
+      };
+    })
+
+    return res.render('pages/resultfirstlevelV2', execution);
+  };
+
   module.exports.shortestPath = async function (req, res) {
     var S1 = req.query.S1;
     var S2 = req.query.S2;
@@ -159,4 +202,82 @@ module.exports.connectParents = function(req,res){
     
   };
     
+
+  module.exports.searchPerson = async function (req, res) {
+    var Z1 = req.query.Z1;
+    const query1 = "match (p:Person{register: 'input1'}) return p";
+    const obj1 = query1.replace('input1', Z1);
+
+    const execution = await session.readTransaction(async (trun) => {
+      const p = await trun.run(obj1);
+      let personArr = [];
+      for (let i = 0; i < p.records?.length; i+=1) {
+        personArr.push({
+                  id: p.records[i]._fields[0].identity.low,
+                  register: p.records[i]._fields[0].properties.register,
+                  firstName: p.records[i]._fields[0].properties.firstName,
+                  lastName: p.records[i]._fields[0].properties.lastName,
+                  dob: p.records[i]._fields[0].properties.dob,
+                  labels: p.records[i]._fields[0].labels
+                });
+      }
+      return {
+        persons: personArr,
+        isDone: true
+      };
+    });
+    return res.render('pages/resultsearchperson', execution);
+  };
     
+  module.exports.edited = async function (req, res) {
+    var firstName = req.body.firstName;
+    var lastName = req.body.lastName;
+    var register = req.body.register;
+    var dob = req.body.dob;
+          const query = "MATCH (p:Person {register: 'input1'})\
+                         SET p.firstName = $firstName\
+                         SET p.lastName = $lastName\
+                         SET p.dob = $dob\
+                         RETURN p"
+          const obj = query.replace('input1', register);
+          // try{}
+    await session.writeTransaction((txc) => {
+      txc.run(obj,{
+        register: register,
+        firstName: firstName,
+        lastName: lastName,
+        dob: dob
+      })
+        .then(function (result) {
+          res.redirect('/success');
+        })
+        .catch(function (err) {
+          res.render('error1');
+        });
+    })
+    .catch((err) => {
+      console.log('Ymar negen aldaa garav')
+    })
+  };
+  module.exports.deleted = async function (req, res) {
+    var register = req.body.register;
+          const query = "MATCH (m:Person {register: 'input1'})\
+                        DETACH DELETE m"
+          const obj = query.replace('input1', register);
+          // try{}
+        console.log(register);
+    await session.writeTransaction((txc) => {
+      txc.run(obj,{
+        register: register
+      })
+        .then(function (result) {
+          res.redirect('/success');
+        })
+        .catch(function (err) {
+          res.render('error1');
+        });
+    })
+    .catch((err) => {
+      console.log('Ymar negen aldaa garav')
+    })
+  };
