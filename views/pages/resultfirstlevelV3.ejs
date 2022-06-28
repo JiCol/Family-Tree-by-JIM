@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('../partials/result'); %>
+    <style>
+     .node circle {
+	  fill: #fff;
+	  stroke: steelblue;
+	  stroke-width: 3px;
+	}
+
+	.node text { font: 12px sans-serif; }
+
+	.link {
+	  fill: none;
+	  stroke: #ccc;
+	  stroke-width: 2px;
+	}
+
+    </style>
+</head>
+<body class="container">
+<header>
+    <%- include('../partials/header'); %>
+</header>
+<main>
+<div class="row">
+  <div class="col-sm-12">
+    <div class="jumbotron">
+      <h2>Optimus Prime</h2>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+      <script src="https://d3js.org/d3.v3.min.js"></script>
+      <script>
+        let parentz = <%-JSON.stringify(persons)%>;
+        let childs = <%-JSON.stringify(guys)%>;
+        let brothers = <%-JSON.stringify(brothers)%>;
+      </script>
+      <script src="javascripts/optimusprime.js"></script>
+      <script>
+        var data = naruto;
+// *********** Convert flat data into a nice tree ***************
+// create a name: node map
+var dataMap = data.reduce(function(map, node) {
+	map[node.name] = node;
+	return map;
+}, {});
+
+// create the tree array
+var treeData = [];
+data.forEach(function(node) {
+	// add to parent
+	var parent = dataMap[node.parent];
+	if (parent) {
+		// create child array if it doesn't exist
+		(parent.children || (parent.children = []))
+			// add node to child array
+			.push(node);
+	} else {
+		// parent is null or missing
+		treeData.push(node);
+	}
+});
+
+// ************** Generate the tree diagram	 *****************
+var margin = {top: 20, right: 120, bottom: 20, left: 120},
+	width = 960 - margin.right - margin.left,
+	height = 500 - margin.top - margin.bottom;
+	
+var i = 0;
+
+var tree = d3.layout.tree()
+	.size([height, width]);
+
+var diagonal = d3.svg.diagonal()
+	.projection(function(d) { return [d.y, d.x]; });
+
+var svg = d3.select("body").append("svg")
+	.attr("width", width + margin.right + margin.left)
+	.attr("height", height + margin.top + margin.bottom)
+  .append("g")
+	.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+root = treeData[0];
+  
+update(root);
+
+function update(source) {
+
+  // Compute the new tree layout.
+  var nodes = tree.nodes(root).reverse(),
+	  links = tree.links(nodes);
+
+  // Normalize for fixed-depth.
+  nodes.forEach(function(d) { d.y = d.depth * 180; });
+
+  // Declare the nodes…
+  var node = svg.selectAll("g.node")
+	  .data(nodes, function(d) { return d.id || (d.id = ++i); });
+
+  // Enter the nodes.
+  var nodeEnter = node.enter().append("g")
+	  .attr("class", "node")
+	  .attr("transform", function(d) { 
+		  return "translate(" + d.y + "," + d.x + ")"; });
+
+  nodeEnter.append("circle")
+	  .attr("r", 10)
+	  .style("fill", "#fff");
+
+  nodeEnter.append("text")
+	  .attr("x", function(d) { 
+		  return d.children || d._children ? -13 : 13; })
+	  .attr("dy", ".35em")
+	  .attr("text-anchor", function(d) { 
+		  return d.children || d._children ? "end" : "start"; })
+	  .text(function(d) { return d.name; })
+	  .style("fill-opacity", 1);
+
+  // Declare the links…
+  var link = svg.selectAll("path.link")
+	  .data(links, function(d) { return d.target.id; });
+
+  // Enter the links.
+  link.enter().insert("path", "g")
+	  .attr("class", "link")
+	  .attr("d", diagonal);
+
+}
+
+        </script>
+      <div id="tree-container"></div>
+    <form method="get" action="/resultfirstlevelV3">
+      <div class="btn-group" role="group" aria-label="Basic example">
+        <input type="text" class="form-control" name="S1" id="func1" hidden />
+        <input type="text" class="form-control" name="funcType" value="1" hidden />
+        <button type="submit" class="btn btn-dark">Эцэг эх харуулах</button>
+    </form>
+    <form method="get" action="/resultfirstlevelV3">
+        <div class="btn-group" role="group" aria-label="Basic example">
+          <input type="text" class="form-control" name="S1" id="func2" hidden />
+          <input type="text" class="form-control" name="funcType" value="2" hidden />
+          <button type="submit" class="btn btn-light">Ах дүүс харуулах</button>
+      </form>
+    </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<footer>
+    <%- include('../partials/footer'); %>
+</footer>
+
+</body>
+</html>

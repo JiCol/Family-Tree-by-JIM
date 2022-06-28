@@ -1,19 +1,19 @@
 
-const neo4j = require('neo4j-driver');
-const driver = neo4j.driver('bolt://127.0.0.1:7687', neo4j.auth.basic('neo4j', '123test'));
-const session = driver.session({
-  database: 'realfamilytree'
-});
-
 // const neo4j = require('neo4j-driver');
-// const uri = 'neo4j+s://14f4bfca.databases.neo4j.io';
-//  const user = 'neo4j';
-//  const password = 'CCr7907w5u5G-mw6QicIuEZR86-LKKpjOdNO0iSXJmI';
-
-// const driver = neo4j.driver(uri, neo4j.auth.basic(user, password))
+// const driver = neo4j.driver('bolt://127.0.0.1:7687', neo4j.auth.basic('neo4j', '123test'));
 // const session = driver.session({
-//   database: 'neo4j'
+//   database: 'realfamilytree'
 // });
+
+const neo4j = require('neo4j-driver');
+const uri = 'neo4j+s://14f4bfca.databases.neo4j.io';
+ const user = 'neo4j';
+ const password = 'CCr7907w5u5G-mw6QicIuEZR86-LKKpjOdNO0iSXJmI';
+
+const driver = neo4j.driver(uri, neo4j.auth.basic(user, password))
+const session = driver.session({
+  database: 'neo4j'
+});
 
 module.exports.addUser = async function (req, res) {
   var firstName = req.body.firstName;
@@ -23,7 +23,6 @@ module.exports.addUser = async function (req, res) {
   var S1 = req.body.S1;
         const query = 'CREATE(n:Person:input1 {register: $register, firstName: $firstName, lastName: $lastName, dob: $dob}) RETURN n';
         const obj = query.replace('input1', S1);
-        // try{}
   await session.writeTransaction((txc) => {
     txc.run(obj,{
       register: register,
@@ -135,16 +134,33 @@ module.exports.connectParents = function(req,res){
 
   module.exports.firstLevelV2 = async function (req, res) {
     var S1 = req.query.S1;
-    const query1 = "match (p:Person{register:'input'}) return p";
+    var funcType= req.query.funcType;
+    let r = {};
+    if(req.query.R){
+      r = await JSON.parse(req.query.R);
+      for (let el of r.nodes) {
+        delete el.x;
+        delete el.y;
+        delete el.vx;
+        delete el.vy;
+      }
+      for (let el of r.links) {
+        delete el.source.index;
+        delete el.target.index;
+      }
+    }
+    if(funcType==='1') { 
+      const a = await firstLevelV3(S1);
+      return res.render('pages/resultfirstlevelV2', {...a, r: r});
+    } else if(funcType==='2') {
+      const a = await firstLevelV4(S1);
+      return res.render('pages/resultfirstlevelV2', {...a, r: r});
+    }
+    var query1 = "match (p:Person{register:'input'}) return p";
     const obj1 = query1.replace('input', S1);
-    // const query2 = "match (p:Person{register:'input'})-[f:Аав]->(p1:Person)<-[m:Гэрлэсэн]-(p2:Person)-[:Хүү|:Охин]->(p3:Person) return p3";
-    // const obj2 = query2.replace('input', S1);
-    // Person
     const execution = await session.readTransaction(async (trun) => {
       const parents = await trun.run(obj1);
-      // const persons = await trun.run(obj2);
       let personArr = [];
-      // let guyArr = [];
       for (let i = 0; i < parents.records?.length; i+=1) {
         personArr.push({
                   id: parents.records[i]._fields[0].identity.low,
@@ -155,24 +171,15 @@ module.exports.connectParents = function(req,res){
                   labels: parents.records[i]._fields[0].labels
                 });
       }
-      // for (let j = 0; j < persons.records?.length; j+=1) {
-      //   guyArr.push({
-      //                   id: persons.records[j]._fields[0].identity.low,
-      //                   register: persons.records[j]._fields[0].properties.register,
-      //                   firstName: persons.records[j]._fields[0].properties.firstName,
-      //                   lastName: persons.records[j]._fields[0].properties.lastName,
-      //                   dob: persons.records[j]._fields[0].properties.dob,
-      //                   labels: persons.records[j]._fields[0].labels
-      //                 })
-      // }
-      console.log(personArr);
       return {
         persons: personArr, 
         guys: [],
-        isDone: true
+        brothers: [],
+        isDone: true,
+        r: r
       };
     })
-
+    console.log(execution)
     return res.render('pages/resultfirstlevelV2', execution);
   };
 
@@ -197,7 +204,9 @@ module.exports.connectParents = function(req,res){
         persons: personArr,
         isDone: true
       };
+
     });
+    
     return res.render('pages/resultshortestpath', execution);
     
   };
@@ -281,3 +290,213 @@ module.exports.connectParents = function(req,res){
       console.log('Ymar negen aldaa garav')
     })
   };
+
+
+
+  //Nemelt optimus prime
+  
+
+  const firstLevelV3 = async function (S1) {
+    console.log("S1====================", S1)
+    const query1 = "match (p:Person{register:'input'})<-[:Хүү|:Охин]-(p1:Person) return p1";
+    const obj1 = query1.replace('input', S1);
+    const query2 = "match (p:Person{register:'input'}) return p";
+    const obj2 = query2.replace('input', S1);
+    const execution = await session.readTransaction(async (trun) => {
+      const parents = await trun.run(obj1);
+      const persons = await trun.run(obj2);
+      let personArr = [], guyArr = [];
+      for (let i = 0; i < parents.records?.length; i+=1) {
+        personArr.push({
+                  id: parents.records[i]._fields[0].identity.low,
+                  register: parents.records[i]._fields[0].properties.register,
+                  firstName: parents.records[i]._fields[0].properties.firstName,
+                  lastName: parents.records[i]._fields[0].properties.lastName,
+                  dob: parents.records[i]._fields[0].properties.dob,
+                  labels: parents.records[i]._fields[0].labels
+                });
+      }
+      for (let j = 0; j < persons.records?.length; j+=1) {
+        guyArr.push({
+                        id: persons.records[j]._fields[0].identity.low,
+                        register: persons.records[j]._fields[0].properties.register,
+                        firstName: persons.records[j]._fields[0].properties.firstName,
+                        lastName: persons.records[j]._fields[0].properties.lastName,
+                        dob: persons.records[j]._fields[0].properties.dob,
+                        labels: persons.records[j]._fields[0].labels
+                      })
+      }
+      return {
+        persons: personArr, 
+        guys: guyArr,
+        brothers:[],
+        isDone: true
+      };
+    });
+
+    return execution;
+  };
+
+  const firstLevelV4 = async function (S1) {
+    const query1 = "match (p:Person{register:'input'})-[f:Аав]->(p1:Person)<-[m:Гэрлэсэн]-(p2:Person)-[:Хүү|:Охин]->(p3:Person) return p3";
+    const obj1 = query1.replace('input', S1);
+    const execution = await session.readTransaction(async (trun) => {
+      const parents = await trun.run(obj1);
+      let personArr = [], brotherArr=[];
+      for (let i = 0; i < parents.records?.length; i+=1) {
+        if(parents.records[i]._fields[0].properties.register === S1){
+          personArr.push({
+                  id: parents.records[i]._fields[0].identity.low,
+                  register: parents.records[i]._fields[0].properties.register,
+                  firstName: parents.records[i]._fields[0].properties.firstName,
+                  lastName: parents.records[i]._fields[0].properties.lastName,
+                  dob: parents.records[i]._fields[0].properties.dob,
+                  labels: parents.records[i]._fields[0].labels
+                });
+      } else {
+        brotherArr.push({
+          id: parents.records[i]._fields[0].identity.low,
+                  register: parents.records[i]._fields[0].properties.register,
+                  firstName: parents.records[i]._fields[0].properties.firstName,
+                  lastName: parents.records[i]._fields[0].properties.lastName,
+                  dob: parents.records[i]._fields[0].properties.dob,
+                  labels: parents.records[i]._fields[0].labels
+        });
+      }
+    }
+      return {
+        persons: personArr, 
+        brothers: brotherArr,
+        guys:[],
+        isDone: true
+      };
+    });
+    return execution;
+  
+  };
+
+
+
+
+
+
+
+  //optimus
+  module.exports.firstLevelVV2 = async function (req, res) {
+    var S1 = req.query.S1;
+    var funcType= req.query.funcType;
+    if(funcType==='1') { 
+      const a = await firstLevelVV3(S1);
+      return res.render('pages/resultfirstlevelV3', a);
+    } else if(funcType==='2') {
+      const a = await firstLevelVV4(S1);
+      return res.render('pages/resultfirstlevelV3', a);
+    }
+    var query1 = "match (p:Person{register:'input'}) return p";
+    const obj1 = query1.replace('input', S1);
+    const execution = await session.readTransaction(async (trun) => {
+      const parents = await trun.run(obj1);
+      let personArr = [];
+      for (let i = 0; i < parents.records?.length; i+=1) {
+        personArr.push({
+                  id: parents.records[i]._fields[0].identity.low,
+                  register: parents.records[i]._fields[0].properties.register,
+                  firstName: parents.records[i]._fields[0].properties.firstName,
+                  lastName: parents.records[i]._fields[0].properties.lastName,
+                  dob: parents.records[i]._fields[0].properties.dob,
+                  labels: parents.records[i]._fields[0].labels
+                });
+      }
+      return {
+        persons: personArr, 
+        guys: [],
+        brothers: [],
+        isDone: true
+      };
+    })
+    return res.render('pages/resultfirstlevelV3', execution);
+    
+  };
+
+
+
+  const firstLevelVV3 = async function (S1) {
+    const query1 = "match (p:Person{register:'input'})<-[:Хүү|:Охин]-(p1:Person) return p1";
+    const obj1 = query1.replace('input', S1);
+    const query2 = "match (p:Person{register:'input'}) return p";
+    const obj2 = query2.replace('input', S1);
+    const execution = await session.readTransaction(async (trun) => {
+      const parents = await trun.run(obj1);
+      const persons = await trun.run(obj2);
+      let personArr = [], guyArr = [];
+      for (let i = 0; i < parents.records?.length; i+=1) {
+        personArr.push({
+                  id: parents.records[i]._fields[0].identity.low,
+                  register: parents.records[i]._fields[0].properties.register,
+                  firstName: parents.records[i]._fields[0].properties.firstName,
+                  lastName: parents.records[i]._fields[0].properties.lastName,
+                  dob: parents.records[i]._fields[0].properties.dob,
+                  labels: parents.records[i]._fields[0].labels
+                });
+      }
+      for (let j = 0; j < persons.records?.length; j+=1) {
+        guyArr.push({
+                        id: persons.records[j]._fields[0].identity.low,
+                        register: persons.records[j]._fields[0].properties.register,
+                        firstName: persons.records[j]._fields[0].properties.firstName,
+                        lastName: persons.records[j]._fields[0].properties.lastName,
+                        dob: persons.records[j]._fields[0].properties.dob,
+                        labels: persons.records[j]._fields[0].labels
+                      })
+      }
+      return {
+        persons: personArr, 
+        guys: guyArr,
+        brothers:[],
+        isDone: true
+      };
+    });
+
+    return execution;
+  };
+
+  const firstLevelVV4 = async function (S1) {
+    const query1 = "match (p:Person{register:'input'})-[f:Аав]->(p1:Person)<-[m:Гэрлэсэн]-(p2:Person)-[:Хүү|:Охин]->(p3:Person) return p3";
+    const obj1 = query1.replace('input', S1);
+    const execution = await session.readTransaction(async (trun) => {
+      const parents = await trun.run(obj1);
+      let personArr = [], brotherArr=[];
+
+      for (let i = 0; i < parents.records?.length; i+=1) {
+        if(parents.records[i]._fields[0].properties.register === S1){
+          personArr.push({
+                  id: parents.records[i]._fields[0].identity.low,
+                  register: parents.records[i]._fields[0].properties.register,
+                  firstName: parents.records[i]._fields[0].properties.firstName,
+                  lastName: parents.records[i]._fields[0].properties.lastName,
+                  dob: parents.records[i]._fields[0].properties.dob,
+                  labels: parents.records[i]._fields[0].labels
+                });
+      } else {
+        brotherArr.push({
+          id: parents.records[i]._fields[0].identity.low,
+                  register: parents.records[i]._fields[0].properties.register,
+                  firstName: parents.records[i]._fields[0].properties.firstName,
+                  lastName: parents.records[i]._fields[0].properties.lastName,
+                  dob: parents.records[i]._fields[0].properties.dob,
+                  labels: parents.records[i]._fields[0].labels
+        });
+      }
+    }
+      return {
+        
+        persons: personArr, 
+        brothers: brotherArr,
+        guys:[],
+        isDone: true
+      };
+    });
+    return execution;
+  
+  };
+

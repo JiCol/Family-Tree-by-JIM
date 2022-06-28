@@ -35,10 +35,10 @@ const calculateAge = (birthday) => {
   //   nodes = [...nodes, {"name": childs[childs.length-1].end.properties.firstName,"lname": childs[childs.length-1].end.properties.lastName,"register": childs[childs.length-1].end.properties.register , "dob": calculateAge(childs[childs.length-1].end.properties.dob), "label": childs[childs.length-1].end.labels[1], "id": childs[childs.length-1].end.properties.firstName}]
 //test
 childs.forEach( (item, index)=> {
-  nodes = [...nodes, {"name": item.start.properties.firstName,"lname": item.start.properties.lastName,"register": item.start.properties.register, "dob": calculateAge(item.start.properties.dob), "label": item.start.labels[1], "id": item.start.properties.firstName}]
+  nodes = [...nodes, {"name": item.start.properties.firstName,"lname": item.start.properties.lastName,"register": item.start.properties.register, "dob": item.start.properties.dob, "label": item.start.labels[1], "id": item.start.properties.firstName}]
 
 })
-nodes = [...nodes, {"name": childs[childs.length-1].end.properties.firstName,"lname": childs[childs.length-1].end.properties.lastName,"register": childs[childs.length-1].end.properties.register , "dob": calculateAge(childs[childs.length-1].end.properties.dob), "label": childs[childs.length-1].end.labels[1], "id": childs[childs.length-1].end.properties.firstName}]
+nodes = [...nodes, {"name": childs[childs.length-1].end.properties.firstName,"lname": childs[childs.length-1].end.properties.lastName,"register": childs[childs.length-1].end.properties.register , "dob": childs[childs.length-1].end.properties.dob, "label": childs[childs.length-1].end.labels[1], "id": childs[childs.length-1].end.properties.firstName}]
 
 
 let tmpArr=[];

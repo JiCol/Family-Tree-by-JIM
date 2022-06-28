@@ -11,6 +11,8 @@ router.get("/firstlevel", index.firstLevel)
 
 router.get("/firstlevelV2", index.firstLevelV2)
 
+router.get("/firstlevelV3", index.firstLevelVV2)
+
 router.post("/adduser", index.addUser)
 
 router.post("/connectparents", index.connectParents)

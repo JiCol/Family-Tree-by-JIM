@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var jwt = require("jsonwebtoken");
 
 var mainLogics = require('./modules/index');
 
@@ -23,54 +24,99 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.get('/', function(req, res) {
+let auth = function(req, res, next){
+  try {
+    jwt.verify(req.cookies.token, "secret", function(err, decoded){
+      if(err) res.redirect("/login")
+      else if(decoded) next();
+    })
+  } catch(e){
+    res.redirect("/login");
+  }
+}
+
+app.get('/', auth, function(req, res) {
   res.render('pages/home');
 });
 
-app.get('/adduser', function(req, res) {
+app.get('/adduser', auth, function(req, res) {
   res.render('pages/addperson');
 });
 
-app.get('/success', function(req, res) {
+app.get('/success', auth, function(req, res) {
   res.render('pages/success');
 });
 
-app.get('/error', function(req, res) {
+app.get('/error', auth, function(req, res) {
   res.render('error');
 });
 
-app.get('/connectpartner', function(req, res) {
+app.get('/connectpartner', auth, function(req, res) {
   res.render('pages/connectpartner');
 });
 
-app.get('/connectparents', function(req, res) {
+app.get('/connectparents', auth, function(req, res) {
   res.render('pages/connectparents');
 });
 
- app.get('/firstlevel', function(req, res){
+ app.get('/firstlevel', auth, function(req, res){
    res.render('pages/firstlevel');
  });
 
- app.get('/firstlevelV2', function(req, res){
+ app.get('/firstlevelV2', auth, function(req, res){
   res.render('pages/firstlevelV2');
 });
 
-app.get('/resultfirstlevel', mainLogics.firstLevel);
+app.get('/firstlevelV3', auth, function(req, res){
+  res.render('pages/firstlevelV3');
+});
 
-app.get('/resultfirstlevelV2', mainLogics.firstLevelV2);
+app.get('/resultfirstlevel', auth, mainLogics.firstLevel);
 
-app.get('/shortestpath', function(req, res){
+app.get('/resultfirstlevelV2', auth, mainLogics.firstLevelV2);
+
+app.get('/resultfirstlevelV3', auth, mainLogics.firstLevelVV2);
+
+app.get('/shortestpath', auth, function(req, res){
   res.render('pages/shortestpath');
 });
 
-app.get('/resultshortestpath', mainLogics.shortestPath);
+app.get('/resultshortestpath', auth, mainLogics.shortestPath);
 
-app.get('/searchperson', function(req, res){
+app.get('/searchperson', auth, function(req, res){
   res.render('pages/searchperson');
 });
 
-app.get('/resultsearchperson', mainLogics.searchPerson);
+app.get('/resultsearchperson', auth, mainLogics.searchPerson);
 
+app.get('/login', function(req, res){
+  res.render('pages/login');
+});
+
+
+app.post("/login", function(req, res){
+  req.app.get('db').collection("user").findOne({...req.body}, function(err, user){
+    if(err) res.redirect("/login");
+    else if(!user) res.redirect("/login");
+    else {
+      let token = jwt.sign({ _id: user._id }, 'secret');
+      res.cookie('token', token);
+      res.redirect('/');
+    }
+  })
+})
+
+app.get('/register', function(req, res){
+  res.render('pages/register');
+});
+
+app.post("/register", function(req, res){
+  req.app.get('db').collection("user").insertOne({
+    ...req.body
+  }, function(err){
+    res.redirect("/login")
+  })
+})
 
 //Iishee zugleed yhavde...
 app.use('/', indexRouter);
